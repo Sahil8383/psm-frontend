@@ -1,13 +1,13 @@
 import { axiosClient } from "./axios-instance";
-import { PropertyFilterDto, PropertiesResponse } from "../types/property";
+import { PropertiesResponse } from "../types/property";
 
 export const propertyService = {
   async getProperties(
-    filterDto: PropertyFilterDto = {}
+    params: { page?: number; limit?: number } = {}
   ): Promise<PropertiesResponse> {
     try {
       const response = await axiosClient.get("/properties", {
-        params: filterDto,
+        params,
       });
       return response.data;
     } catch (error) {

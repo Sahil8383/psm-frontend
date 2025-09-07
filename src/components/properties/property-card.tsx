@@ -1,22 +1,9 @@
 "use client";
 
 import { Property } from "@/lib/types/property";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  MapPin,
-  Building,
-  Car,
-  Square,
-  IndianRupee,
-  Calendar,
-  Phone,
-  Mail,
-  Eye,
-  MessageCircle,
-} from "lucide-react";
+import { Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 interface PropertyCardProps {
   property: Property;
@@ -24,11 +11,10 @@ interface PropertyCardProps {
   onInquire?: (property: Property) => void;
 }
 
-export function PropertyCard({
-  property,
-  onViewDetails,
-  onInquire,
-}: PropertyCardProps) {
+export function PropertyCard({ property, onViewDetails }: PropertyCardProps) {
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
@@ -37,165 +23,107 @@ export function PropertyCard({
     }).format(amount);
   };
 
-  const formatArea = (area: number) => {
-    return `${area.toLocaleString()} sq ft`;
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsFavorited(!isFavorited);
   };
 
+  const handlePreviousImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? property.media.images.length - 1 : prev - 1
+    );
+  };
+
+  const handleNextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) =>
+      prev === property.media.images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const hasMultipleImages = property.media.images.length > 1;
+
   return (
-    <Card className="w-full hover:shadow-lg transition-shadow duration-200">
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <CardTitle className="text-lg font-semibold text-gray-900 mb-1">
-              {property.propertyDetails.buildingName}
-            </CardTitle>
-            <div className="flex items-center text-sm text-gray-600 mb-2">
-              <MapPin className="h-4 w-4 mr-1" />
-              <span>{property.propertyDetails.completeAddress}</span>
-            </div>
-            <div className="flex items-center text-sm text-gray-600">
-              <Building className="h-4 w-4 mr-1" />
-              <span>Pin: {property.propertyDetails.pinCode}</span>
-            </div>
-          </div>
-          <Badge
-            variant={property.status === "available" ? "default" : "secondary"}
-            className="ml-2"
-          >
-            {property.status}
-          </Badge>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-4">
-        {/* Property Image */}
-        {property.media.images.length > 0 && (
-          <div className="relative h-48 w-full rounded-lg overflow-hidden">
-            {/* <img
-              src={""}
+    <div
+      className="w-full duration-200 cursor-pointer"
+      onClick={() => onViewDetails?.(property)}
+    >
+      <div className="p-0">
+        <div className="relative h-64 w-full rounded-lg overflow-hidden group">
+          {property.media.images.length > 0 ? (
+            <Image
+              src={property.media.images[currentImageIndex]}
               alt={property.propertyDetails.buildingName}
+              fill
               className="object-cover"
-            /> */}
-          </div>
-        )}
-
-        {/* Key Details */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center space-x-2">
-            <IndianRupee className="h-4 w-4 text-green-600" />
-            <div>
-              <p className="text-sm text-gray-600">Monthly Rent</p>
-              <p className="font-semibold text-green-600">
-                {formatCurrency(property.commercialTerms.monthlyRent)}
-              </p>
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="text-gray-500">No Image</span>
             </div>
-          </div>
+          )}
 
-          <div className="flex items-center space-x-2">
-            <Square className="h-4 w-4 text-blue-600" />
-            <div>
-              <p className="text-sm text-gray-600">Carpet Area</p>
-              <p className="font-semibold text-blue-600">
-                {formatArea(property.propertyDetails.carpetArea)}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Additional Details */}
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="flex items-center space-x-2">
-            <Car className="h-4 w-4 text-purple-600" />
-            <span>
-              {property.selectionCriteria.parkingDetails.fourWheelerSpaces} Car
-              Spaces
-            </span>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Calendar className="h-4 w-4 text-orange-600" />
-            <span>
-              {property.selectionCriteria.leasePeriodYears} Years Lease
-            </span>
-          </div>
-        </div>
-
-        {/* Rent per sq ft */}
-        <div className="bg-gray-50 p-3 rounded-lg">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Rent per sq ft:</span>
-            <span className="font-semibold">
-              {formatCurrency(property.commercialTerms.monthlyRentPerSqFt)}/sq
-              ft
-            </span>
-          </div>
-          <div className="flex justify-between items-center mt-1">
-            <span className="text-sm text-gray-600">Security Deposit:</span>
-            <span className="font-semibold">
-              {formatCurrency(property.commercialTerms.securityDepositAmount)}
-            </span>
-          </div>
-        </div>
-
-        {/* Landlord Contact */}
-        <div className="border-t pt-3">
-          <p className="text-sm font-medium text-gray-700 mb-2">
-            Landlord Contact
-          </p>
-          <div className="flex items-center space-x-4 text-sm">
-            <div className="flex items-center space-x-1">
-              <Phone className="h-4 w-4 text-gray-500" />
-              <span>{property.propertyDetails.landlordContact}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Mail className="h-4 w-4 text-gray-500" />
-              <span>{property.propertyDetails.landlordEmail}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Tags */}
-        {property.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {property.tags.slice(0, 3).map((tag, index) => (
-              <Badge key={index} variant="outline" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
-            {property.tags.length > 3 && (
-              <Badge variant="outline" className="text-xs">
-                +{property.tags.length - 3} more
-              </Badge>
-            )}
-          </div>
-        )}
-
-        {/* Stats */}
-        <div className="flex items-center justify-between text-sm text-gray-500 border-t pt-3">
-          <div className="flex items-center space-x-1">
-            <Eye className="h-4 w-4" />
-            <span>{property.viewCount} views</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <MessageCircle className="h-4 w-4" />
-            <span>{property.inquiryCount} inquiries</span>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex space-x-2 pt-2">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={() => onViewDetails?.(property)}
+          <button
+            onClick={handleFavoriteClick}
+            className="absolute top-3 right-3 p-2 rounded-full bg-white/80 hover:bg-white transition-colors duration-200 z-10"
           >
-            View Details
-          </Button>
-          <Button className="flex-1" onClick={() => onInquire?.(property)}>
-            Inquire Now
-          </Button>
+            <Heart
+              className={`h-4 w-4 ${
+                isFavorited
+                  ? "fill-red-500 text-red-500"
+                  : "text-gray-700 hover:text-red-500"
+              }`}
+            />
+          </button>
+
+          {/* Navigation Buttons - Only show if multiple images */}
+          {hasMultipleImages && (
+            <>
+              {/* Previous Button */}
+              <button
+                onClick={handlePreviousImage}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white transition-all duration-200 opacity-0 group-hover:opacity-100 z-10"
+              >
+                <ChevronLeft className="h-4 w-4 text-gray-700" />
+              </button>
+
+              {/* Next Button */}
+              <button
+                onClick={handleNextImage}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white transition-all duration-200 opacity-0 group-hover:opacity-100 z-10"
+              >
+                <ChevronRight className="h-4 w-4 text-gray-700" />
+              </button>
+
+              {/* Image Indicators */}
+              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-1 z-10">
+                {property.media.images.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                      index === currentImageIndex ? "bg-white" : "bg-white/50"
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
-      </CardContent>
-    </Card>
+
+        <div className="p-3 space-y-1">
+          <h3 className="text-base font-semibold text-gray-900 truncate">
+            {property.propertyDetails.buildingName}
+          </h3>
+
+          <div className="flex items-center space-x-1">
+            <span className="text-sm font-medium text-gray-900">
+              {formatCurrency(property.commercialTerms.monthlyRent)}
+            </span>
+            <span className="text-sm text-gray-500">/month</span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
