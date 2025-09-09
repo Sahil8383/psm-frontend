@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { axiosClient } from "../api/axios-instance";
+import { setCookie, removeCookie, getCookie } from "../utils/cookies";
 
 export interface User {
   _id: string;
@@ -7,6 +8,7 @@ export interface User {
   email: string;
   phone: string;
   userType: "landlord" | "tenant" | "both";
+  role?: "regular" | "admin";
   isVerified: boolean;
   createdAt: string;
   updatedAt: string;
@@ -22,8 +24,7 @@ export interface AuthState {
 
 const initialState: AuthState = {
   user: null,
-  token:
-    typeof window !== "undefined" ? localStorage.getItem("psm_token") : null,
+  token: typeof window !== "undefined" ? getCookie("psm_token") : null,
   isAuthenticated: false,
   loading: false,
   error: null,
@@ -97,7 +98,7 @@ const authSlice = createSlice({
       state.token = null;
       state.isAuthenticated = false;
       if (typeof window !== "undefined") {
-        localStorage.removeItem("psm_token");
+        removeCookie("psm_token");
       }
     },
     clearError: (state) => {
@@ -107,7 +108,7 @@ const authSlice = createSlice({
       state.token = action.payload;
       state.isAuthenticated = true;
       if (typeof window !== "undefined") {
-        localStorage.setItem("psm_token", action.payload);
+        setCookie("psm_token", action.payload);
       }
     },
   },
@@ -124,7 +125,7 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.isAuthenticated = true;
         if (typeof window !== "undefined") {
-          localStorage.setItem("psm_token", action.payload.token);
+          setCookie("psm_token", action.payload.token);
         }
       })
       .addCase(login.rejected, (state, action) => {
@@ -142,7 +143,7 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.isAuthenticated = true;
         if (typeof window !== "undefined") {
-          localStorage.setItem("psm_token", action.payload.token);
+          setCookie("psm_token", action.payload.token);
         }
       })
       .addCase(register.rejected, (state, action) => {
@@ -164,7 +165,7 @@ const authSlice = createSlice({
         state.error = action.payload as string;
         state.isAuthenticated = false;
         if (typeof window !== "undefined") {
-          localStorage.removeItem("psm_token");
+          removeCookie("psm_token");
         }
       });
   },

@@ -25,4 +25,14 @@ export const propertyService = {
       throw error;
     }
   },
+
+  async deleteProperty(id: string) {
+    try {
+      const response = await axiosClient.delete(`/properties/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting property:", error);
+      throw error;
+    }
+  },
 };

@@ -55,7 +55,7 @@ const Navbar = () => {
               href="#"
               className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
             >
-              Buy
+              Explore
             </Link>
             <Link
               href="#"
@@ -63,12 +63,22 @@ const Navbar = () => {
             >
               Sell
             </Link>
-            <Link
-              href="#"
-              className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
-            >
-              About
-            </Link>
+            {isAuthenticated && user && (
+              <Link
+                href="#"
+                className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
+              >
+                My Properties
+              </Link>
+            )}
+            {isAuthenticated && user?.role === "admin" && (
+              <Link
+                href="/admin"
+                className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
+              >
+                Admin
+              </Link>
+            )}
             <Link
               href="#"
               className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
@@ -129,7 +139,7 @@ const Navbar = () => {
                 className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium transition-colors"
                 onClick={closeMobileMenu}
               >
-                Buy
+                Explore
               </Link>
               <Link
                 href="#"
@@ -138,13 +148,23 @@ const Navbar = () => {
               >
                 Sell
               </Link>
-              <Link
-                href="#"
-                className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium transition-colors"
-                onClick={closeMobileMenu}
-              >
-                About
-              </Link>
+              {isAuthenticated && user && (
+                <Link
+                  href="#"
+                  className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
+                >
+                  My Properties
+                </Link>
+              )}
+              {isAuthenticated && user?.role === "admin" && (
+                <Link
+                  href="/admin"
+                  className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Admin
+                </Link>
+              )}
               <Link
                 href="#"
                 className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium transition-colors"

@@ -1,17 +1,34 @@
 "use client";
 
-import { Property } from "@/lib/types/property";
-import { Heart, ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
 import { useState } from "react";
+import { Property } from "@/lib/types/property";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Trash2, Heart, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import Image from "next/image";
 
-interface PropertyCardProps {
+interface AdminPropertyCardProps {
   property: Property;
-  onViewDetails?: (property: Property) => void;
-  onInquire?: (property: Property) => void;
+  onDelete: (propertyId: string) => void;
+  isDeleting: boolean;
 }
 
-export function PropertyCard({ property, onViewDetails }: PropertyCardProps) {
+export default function AdminPropertyCard({
+  property,
+  onDelete,
+  isDeleting,
+}: AdminPropertyCardProps) {
   const [isFavorited, setIsFavorited] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -45,10 +62,7 @@ export function PropertyCard({ property, onViewDetails }: PropertyCardProps) {
   const hasMultipleImages = property.media.images.length > 1;
 
   return (
-    <div
-      className="w-full duration-200 cursor-pointer"
-      onClick={() => onViewDetails?.(property)}
-    >
+    <div className="w-full duration-200">
       <div className="p-0">
         <div className="relative h-64 w-full rounded-lg overflow-hidden group">
           {property.media.images.length > 0 ? (
@@ -77,10 +91,48 @@ export function PropertyCard({ property, onViewDetails }: PropertyCardProps) {
             />
           </button>
 
+          {/* Delete Button */}
+          <div className="absolute top-3 left-3 z-10">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  disabled={isDeleting}
+                  className="p-2 rounded-full bg-red-500/80 hover:bg-red-500 text-white"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Property</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete this property? This action
+                    cannot be undone.
+                    <br />
+                    <br />
+                    <strong>{property.propertyDetails.buildingName}</strong>
+                    <br />
+                    {property.propertyDetails.completeAddress}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => onDelete(property._id)}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Delete Property
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+
           {/* Navigation Buttons - Only show if multiple images */}
           {hasMultipleImages && (
             <>
-              {/* Previous Button */}
               <button
                 onClick={handlePreviousImage}
                 className="absolute cursor-pointer left-3 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white transition-all duration-200 opacity-0 group-hover:opacity-100 z-10"
@@ -88,7 +140,6 @@ export function PropertyCard({ property, onViewDetails }: PropertyCardProps) {
                 <ChevronLeft className="h-4 w-4 text-gray-700" />
               </button>
 
-              {/* Next Button */}
               <button
                 onClick={handleNextImage}
                 className="absolute cursor-pointer right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white transition-all duration-200 opacity-0 group-hover:opacity-100 z-10"
@@ -99,7 +150,7 @@ export function PropertyCard({ property, onViewDetails }: PropertyCardProps) {
           )}
         </div>
 
-        <div className="p-3 space-y-1">
+        <div className="p-3 space-y-2">
           <h3 className="text-base font-semibold text-gray-900 truncate">
             {property.propertyDetails.buildingName}
           </h3>
@@ -109,6 +160,18 @@ export function PropertyCard({ property, onViewDetails }: PropertyCardProps) {
               {formatCurrency(property.commercialTerms.monthlyRent)}
             </span>
             <span className="text-sm text-gray-500">/month</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Badge
+              variant={property.status === "active" ? "default" : "secondary"}
+              className="text-xs"
+            >
+              {property.status}
+            </Badge>
+            <Badge variant="outline" className="text-xs">
+              {property.propertyDetails.carpetArea} sq ft
+            </Badge>
           </div>
         </div>
       </div>

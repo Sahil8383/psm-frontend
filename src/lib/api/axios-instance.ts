@@ -3,6 +3,7 @@ import Axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
+import { getCookie } from "../utils/cookies";
 
 const BASE_API_URL = process.env["NEXT_PUBLIC_API_URL"];
 
@@ -21,7 +22,7 @@ interface ApiResponse {
 const handleRequest = (
   config: InternalAxiosRequestConfig
 ): InternalAxiosRequestConfig => {
-  const token = localStorage.getItem("psm_token");
+  const token = getCookie("psm_token");
 
   if (token) {
     config.headers["Authorization"] = `Bearer ${token}`;
