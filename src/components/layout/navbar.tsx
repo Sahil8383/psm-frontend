@@ -58,10 +58,10 @@ const Navbar = () => {
               Explore
             </Link>
             <Link
-              href="#"
+              href="/create-property"
               className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
             >
-              Sell
+              Create Property
             </Link>
             {isAuthenticated && user && (
               <Link
@@ -142,11 +142,11 @@ const Navbar = () => {
                 Explore
               </Link>
               <Link
-                href="#"
+                href="/create-property"
                 className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium transition-colors"
                 onClick={closeMobileMenu}
               >
-                Sell
+                Create Property
               </Link>
               {isAuthenticated && user && (
                 <Link
